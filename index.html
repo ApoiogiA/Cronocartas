@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CronoCartas</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React e Babel para rodar JSX direto no navegador -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -36,22 +40,21 @@
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
     body { background-color: #0f172a; color: #f1f5f9; -webkit-font-smoothing: antialiased; overflow: hidden; }
   </style>
-  <script type="importmap">
-    {
-      "imports": {
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client"
-      }
-    }
-  </script>
 <link rel="stylesheet" href="/index.css">
 </head>
 <body>
   <div id="root"></div>
 
-  <script type="module">
-    import React, { useState, useEffect, useRef, useCallback, memo, Fragment } from 'react';
-    import ReactDOM from 'react-dom/client';
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, memo, Fragment } = React;
+
+    // Fallback para crypto.randomUUID que pode falhar em conexões não-HTTPS ou file://
+    const generateId = () => {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    };
 
     // --- BASE DE DADOS ---
     const initialEvents = [
@@ -130,7 +133,7 @@
       { year: 1808, title: "Primeira faculdade do Brasil", description: "As primeiras faculdades foram criadas após a transferência da corte portuguesa para o Brasil." },
       { year: 1810, title: "Fundação da Biblioteca Nacional", description: "É a depositária do patrimônio bibliográfico e documental do Brasil." },
       { year: 1816, title: "Batalha de Catalão", description: "Confronto armado ocorrido no interior de Goiás, ligado às disputas políticas e militares do período de crise do sistema colonial." },
-      { year: 1817, title: "Revolução Pernambucana", description: "Movimento revolucionário de caráter republicano que questionou o domínio português e propôs novas bases políticas e sociais." },
+      { year: 1817, title: "Revolution Pernambucana", description: "Movimento revolucionário de caráter republicano que questionou o domínio português e propôs novas bases políticas e sociais." },
       { year: 1817, title: "Execução do Padre Miguelinho", description: "Episódio repressivo que simboliza a reação violenta do Estado colonial contra lideranças envolvidas em projetos emancipatórios." },
       { year: 1819, title: "Primeira Festa do Divino Espírito Santo em Pirenópolis", description: "Celebração religiosa que marcou a consolidação de tradições culturais e da religiosidade popular no interior goiano." },
       { year: 1821, title: "Movimento separatista do Norte de Goiás", description: "Articulação política que expressou tensões regionais e o descontentamento com a centralização administrativa da província." },
@@ -206,7 +209,7 @@
       { year: 1891, title: "Primeira Constituição Republicana", description: "A Primeira Constituição Republicana consolidou a transição do Brasil de uma Monarquia unitária para uma República Federativa, moldando a estrutura do Estado conforme os interesses das elites regionais que lideraram o movimento republicano." },
       { year: 1891, title: "Promulgação da primeira Constituição de Goiás", description: "A Promulgação da primeira Constituição de Goiás representou a transição da antiga província para um Estado autônomo dentro da nova Federação Brasileira. Esse documento jurídico foi essencial para organizar o poder local e definir as regras de convivência política no cerrado após o fim da Monarquia." },
       { year: 1891, title: "Revolta de Canudos", description: "A Revolta de Canudos foi um dos conflitos mais sangrentos e simbólicos da história do Brasil, representando o choque entre o Brasil litorâneo, que buscava a modernização republicana, e o Brasil do sertão, marcado pela exclusão social e pelo misticismo religioso." },
-      { year: 1893, title: "Comissão Cruls", description: "A Comissão Cruls, formalmente conhecida como Comissão Exploradora do Planalto Central do Brasil, foi a expedição científica fundamental que deu o primeiro passo concreto para the interiorização da capital federal, tirando do papel o desejo de mover o centro das decisões do Rio de Janeiro para o coração do país." },
+      { year: 1893, title: "Comissão Cruls", description: "A Comissão Cruls, formalmente conhecida como Comissão Exploradora do Planalto Central do Brasil, foi a expedição científica fundamental que deu o primeiro passo concreto para a interiorização da capital federal, tirando do papel o desejo de mover o centro das decisões do Rio de Janeiro para o coração do país." },
       { year: 1893, title: "Massacre de Boiçucanga", description: "O Massacre de Boiçucanga (ou Combate de Boiçucanga) foi um episódio violento ocorrido no litoral de São Paulo, inserido no contexto das revoltas tenentistas que sacudiram o Brasil durante a República Velha." },
       { year: 1894, title: "Cerco da Lapa", description: "O Cerco da Lapa foi um dos episódios militares da Revolução Federalista, ocorrido no Paraná. Ele colocou frente a frente os \"pica-paus\" (legalistas que defendiam o governo republicano) e os \"maragatos\" (revolucionários que partiam do Sul com o objetivo de derrubar o presidente Floriano Peixoto)." },
       { year: 1895, title: "Criação do Museu do Ipiranga", description: "A Criação do Museu do Ipiranga (oficialmente Museu Paulista da USP) é um evento que mistura a celebração da independência com o desejo das elites paulistas de construir uma narrativa histórica onde São Paulo ocupa o papel central na formação da nação brasileira." },
@@ -225,7 +228,7 @@
       { year: 1906, title: "Naufrágio do navio Aquidabã", description: "O naufrágio do encouraçado Aquidabã, o navio mais moderno da Marinha Brasileira na época, foi uma das maiores tragédias navais do país. Ele ocorreu na Baía de Jacuecanga, em Angra dos Reis, devido uma explosão interna." },
       { year: 1907, title: "Elevação de Anápolis à categoria de cidade", description: "A Elevação de Anápolis à categoria de cidade marcou o reconhecimento oficial do crescimento econômico e demográfico do antigo povoado de Santana das Antas, consolidando-o como um dos centros urbanos mais importantes do interior de Goiás." },
       { year: 1908, title: "Morte de Machado de Assis", description: "A Morte de Machado de Assis representou o fim de uma era para a cultura brasileira, marcando a partida daquele que é considerado o maior escritor da nossa literatura e o primeiro presidente da Academia Brasileira de Letras (ABL)." },
-      { year: 1909, title: "Inauguração da energia elétrica na Cidade de Goiás", description: "A Inauguração da energia elétrica na Cidade de Goiás (antiga Vila Boa) foi um marco de modernização para the então capital do estado, simbolizando a chegada do progresso tecnológico ao interior do cerrado." },
+      { year: 1909, title: "Inauguração da energia elétrica na Cidade de Goiás", description: "A Inauguração da energia elétrica na Cidade de Goiás (antiga Vila Boa) foi um marco de modernização para a então capital do estado, simbolizando a chegada do progresso tecnológico ao interior do cerrado." },
       { year: 1909, title: "Descoberta da Doença de Chagas", description: "A Descoberta da Doença de Chagas é um dos episódios mais brilhantes da ciência mundial, pois foi a única vez na história da medicina em que um único pesquisador descreveu o ciclo completo de uma nova enfermidade." },
       { year: 1910, title: "Revolta da Chibata", description: "A Revolta da Chibata foi um motim liderado por marinheiros negros e pardos na Baía de Guanabara, no Rio de Janeiro, contra os castigos físicos e as péssimas condições de trabalho na Marinha Brasileira." },
       { year: 1910, title: "Criação do Serviço de Proteção aos Índios", description: "Criado pelo governo federal sob a liderança de Marechal Rondon. Foi a primeira instituição estatal dedicada à questão indígena, baseada no lema \"Morrer se preciso for, matar nunca\". O objetivo era integrar os povos originários à sociedade nacional de forma \"pacífica\"." },
@@ -296,7 +299,7 @@
       { year: 1960, title: "Início da Feira Hippie em Goiânia", description: "Surgiu como espaço de comércio artesanal e expressão cultural alternativa, tornando-se referência nacional." },
       { year: 1960, title: "Publicação de \"Laços de Família\" (Clarice Lispector)", description: "Obra de Clarice Lispector que explora conflitos íntimos e psicológicos do cotidiano urbano." },
       { year: 1961, title: "Renúncia de Jânio Quadros", description: "Jânio renunciou inesperadamente, gerando crise política e abrindo caminho para o parlamentarismo." },
-      { year: 1961, title: "Criação do Parque Nacional da Chapada dos Veadeiros", description: "Área de preservação ambiental em Goiás, criada para proteger o Cerrado e sua biodiversidade." },
+      { year: 1961, title: "Criação do Parque Nacional da Chapada dos Veadeiros", description: "Area de preservação ambiental em Goiás, criada para proteger o Cerrado e sua biodiversidade." },
       { year: 1961, title: "Primeira Lei de Diretrizes e Bases da Educação", description: "Estabeleceu as bases legais do sistema educacional brasileiro, organizando níveis e diretrizes do ensino." },
       { year: 1961, title: "Incêndio do Gran Circus Norte-Americano (Niterói)", description: "Tragédia ocorrida em Niterói que matou centenas de pessoas, majoritariamente crianças." },
       { year: 1961, title: "Política Externa Independente (San Tiago Dantas)", description: "Conduzida por San Tiago Dantas, buscava autonomia diplomática frente aos EUA e URSS." },
@@ -322,7 +325,7 @@
       { year: 1975, title: "Inauguração do Estádio Serra Dourada", description: "Inauguração de um dos maiores estádios de Goiânia, sendo na época o 7 maior do Brasil. " },
       { year: 1975, title: "Brasil reconhece a independência de Angola", description: "Primeiro país a reconhecer a independência do País da Angola." },
       { year: 1975, title: "Acordo Nuclear Brasil-Alemanha", description: "Chamado de o \"acordo do século\" por ser uma relação que envolvia um país industrializado e um país que eles consideravam de \"terceiro mundo\". " },
-      { year: 176, title: "Queda do Elevado Paulo de Frontin (Rio de Janeiro)", description: "Elevador em construção desmorona em viaduto, deixando 48 mortos e muitos feridos." },
+      { year: 1976, title: "Queda do Elevado Paulo de Frontin (Rio de Janeiro)", description: "Elevador em construção desmorona em viaduto, deixando 48 mortos e muitos feridos." },
       { year: 1977, title: "Publicação de \"A Hora da Estrela\" (Clarice Lispector)", description: "Publicação de um dos livros mais conhecidos da autora" },
       { year: 1978, title: "Movimento Negro Unificado", description: "Organização politica e social Brasileira que luta constra o racismo e a disciminação racial." },
       { year: 1979, title: "Morte de Pedro Ludovico Teixeira", description: "Morte do interventor de Goiás e um dos maiores idealizadores da construção de Goiânia." },
@@ -533,7 +536,7 @@
         setIsScoreSaved(false);
         setPlayerName('');
 
-        const fullDeck = initialEvents.map(e => ({ ...e, id: crypto.randomUUID() }));
+        const fullDeck = initialEvents.map(e => ({ ...e, id: generateId() }));
         for (let i = fullDeck.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [fullDeck[i], fullDeck[j]] = [fullDeck[j], fullDeck[i]];
@@ -597,7 +600,7 @@
 
       const handleSaveScore = () => {
         if (!playerName.trim()) return;
-        const n = { id: crypto.randomUUID(), playerName: playerName.trim(), score, mode: gameMode, date: new Date().toISOString() };
+        const n = { id: generateId(), playerName: playerName.trim(), score, mode: gameMode, date: new Date().toISOString() };
         const u = [...leaderboard, n];
         setLeaderboard(u);
         localStorage.setItem('cronocartas_leaderboard', JSON.stringify(u));
